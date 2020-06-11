@@ -8,7 +8,6 @@ const cheapestTicket = document.getElementById('cheapest-ticket');
 const otherCheapTickets = document.getElementById('other-cheap-tickets');
 
 const citiesApi = 'database/cities.json';
-// const proxy = 'https://cors-anywhere.herokuapp.com/';
 const API_KEY = '';
 const calendar = 'http://min-prices.aviasales.ru/calendar_preload';
 
@@ -65,6 +64,16 @@ const getNameCity = (code) => {
   return objCity.name;
 }
 
+const getDate = (date) => {
+  return new Date(date).toLocaleString('ru', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
 const getChanges = num => {
   if(num) {
     return num === 1 ? 'С одной пересадкой' : 'С двумя пересадками';
@@ -92,7 +101,7 @@ const createCard = (data) => {
           <div class="city__from">Вылет из города
             <span class="city__name">${getNameCity(data.origin)}</span>
           </div>
-          <div class="date">${data.depart_date}</div>
+          <div class="date">${getDate(data.depart_date)}</div>
         </div>
       
         <div class="block-right">
@@ -115,14 +124,18 @@ const createCard = (data) => {
 
 
 const renderCheapDay = (cheapTicket) => {
+  cheapestTicket.style.display = 'block';
+  cheapestTicket.innerHTML = '<h2>Самый дешевый билет на выбранную дату</h2>';
+
   const ticket = createCard(cheapTicket[0]);
   cheapestTicket.append(ticket);
 };
 
 const renderCheapYear = (cheapTickets) => {
-  cheapTickets.sort( (a, b) => a.value - b.value);
+  otherCheapTickets.style.display = 'block';
+  otherCheapTickets.innerHTML = '<h2>Самые дешевые билеты на другие даты</h2>';
 
-  console.log(cheapTickets);
+  cheapTickets.sort( (a, b) => a.value - b.value);
 };
 
 const renderCheap = (data, date) => {
