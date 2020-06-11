@@ -141,6 +141,14 @@ const createCard = (data) => {
   return ticket;
 };
 
+const errMsg = (msg) => {
+  cheapestTicket.style.display = 'block';
+  const card = document.createElement('h3');
+  card.innerText = msg;
+  cheapestTicket.append(card);
+  return card;
+}
+
 
 const renderCheapDay = (cheapTicket) => {
   cheapestTicket.style.display = 'block';
@@ -209,10 +217,11 @@ formSearch.addEventListener('submit', (event) => {
     getData(calendar + requestData, (response) => {
       renderCheap(response, formData.when);
     }, (e) => {
-      alert('В этом направлении нет рейсов');
+      // alert('Данных направлений нет'); // Киев - МОнахарс
+      errMsg('Данных направлений нет');
     });
   } else {
-    alert('Введите корректное название города');
+    errMsg('Введите корректное название города');
   }
 
 
