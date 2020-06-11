@@ -10,12 +10,13 @@ const otherCheapTickets = document.getElementById('other-cheap-tickets');
 const citiesApi = 'database/cities.json';
 const API_KEY = '';
 const calendar = 'http://min-prices.aviasales.ru/calendar_preload';
+const MAX_COUNT = 10;
 
 let city = [];
 
 // функции
 
-const getData = (url, callback) => {
+const getData = (url, callback, reject = console.error) => {
   const request = new XMLHttpRequest();
 
   request.open('GET', url);
@@ -26,7 +27,7 @@ const getData = (url, callback) => {
     if (request.status === 200) {
       callback(request.response);
     } else {
-      console.error(request.status);
+      reject(request.status);
     }
   });
 
@@ -82,6 +83,24 @@ const getChanges = num => {
   }
 };
 
+const getLinkAviasales = (data) => {
+  let link = 'https://www.aviasales.ru/search/';
+
+  link += data.origin;
+
+  const date = new Date(data.depart_date);
+
+  const day = date.getDate();
+  link += day < 10 ? '0' + day : day;
+
+  const month = date.getMonth();
+  link += month < 10 ? '0' + month : month;
+
+  link += data.destination;
+
+  return link + '1';
+}
+
 const createCard = (data) => {
   const ticket = document.createElement('article');
   ticket.classList.add('ticket');
@@ -93,7 +112,7 @@ const createCard = (data) => {
     <h3 class="agent">${data.gate}</h3>
     <div class="ticket__wrapper">
       <div class="left-side">
-        <a href="https://www.aviasales.ru/search/SVX2905KGD1" class="button button__buy">Купить
+        <a href="${getLinkAviasales(data)}" class="button button__buy" target="_blank">Купить
         за ${data.value}₽</a>
       </div>
       <div class="right-side">
@@ -136,6 +155,11 @@ const renderCheapYear = (cheapTickets) => {
   otherCheapTickets.innerHTML = '<h2>Самые дешевые билеты на другие даты</h2>';
 
   cheapTickets.sort( (a, b) => a.value - b.value);
+
+  for ( let i = 0; i < cheapTickets.length && i < MAX_COUNT; i++ ) {
+    const ticket = createCard(cheapTickets[i]);
+    otherCheapTickets.append(ticket);
+  }
 };
 
 const renderCheap = (data, date) => {
@@ -184,6 +208,8 @@ formSearch.addEventListener('submit', (event) => {
 
     getData(calendar + requestData, (response) => {
       renderCheap(response, formData.when);
+    }, (e) => {
+      alert('В этом направлении нет рейсов');
     });
   } else {
     alert('Введите корректное название города');
