@@ -4,10 +4,12 @@ const dropdownCitiesFrom = formSearch.querySelector('.dropdown__cities-from');
 const inputCitiesTo = formSearch.querySelector('.input__cities-to');
 const dropdownCitiesTo = formSearch.querySelector('.dropdown__cities-to');
 const inputDateDepart = formSearch.querySelector('.input__date-depart');
+const cheapestTicket = document.getElementById('cheapest-ticket');
+const otherCheapTickets = document.getElementById('other-cheap-tickets');
 
 const citiesApi = 'database/cities.json';
-const proxy = 'https://cors-anywhere.herokuapp.com/';
-const API_KEY = 'f68c15414887b92feb26d8deb52d7e42';
+// const proxy = 'https://cors-anywhere.herokuapp.com/';
+const API_KEY = '';
 const calendar = 'http://min-prices.aviasales.ru/calendar_preload';
 
 let city = [];
@@ -58,8 +60,63 @@ const selectCity = (event, input, list) => {
   }
 };
 
+const getNameCity = (code) => {
+  const objCity = city.find((item) => item.code === code);
+  return objCity.name;
+}
+
+const getChanges = num => {
+  if(num) {
+    return num === 1 ? 'С одной пересадкой' : 'С двумя пересадками';
+  } else {
+    return 'Без пересадок'
+  }
+};
+
+const createCard = (data) => {
+  const ticket = document.createElement('article');
+  ticket.classList.add('ticket');
+
+  let deep = '';
+
+  if(data) {
+    deep = `
+    <h3 class="agent">${data.gate}</h3>
+    <div class="ticket__wrapper">
+      <div class="left-side">
+        <a href="https://www.aviasales.ru/search/SVX2905KGD1" class="button button__buy">Купить
+        за ${data.value}₽</a>
+      </div>
+      <div class="right-side">
+        <div class="block-left">
+          <div class="city__from">Вылет из города
+            <span class="city__name">${getNameCity(data.origin)}</span>
+          </div>
+          <div class="date">${data.depart_date}</div>
+        </div>
+      
+        <div class="block-right">
+          <div class="changes">${getChanges(data.number_of_changes)}</div>
+            <div class="city__to">Город назначения:
+              <span class="city__name">${getNameCity(data.destination)}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    `;
+  } else {
+    deep = '<h3>There are no tickets for this day!</h3>'
+  }
+
+  ticket.insertAdjacentHTML('afterbegin', deep);
+
+  return ticket;
+};
+
+
 const renderCheapDay = (cheapTicket) => {
-  console.log(cheapTicket);
+  const ticket = createCard(cheapTicket[0]);
+  cheapestTicket.append(ticket);
 };
 
 const renderCheapYear = (cheapTickets) => {
