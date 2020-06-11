@@ -8,3 +8,6 @@ input {
   position: absolute;
   z-index: 1;
 }
+li {
+  cursor: pointer;
+}
